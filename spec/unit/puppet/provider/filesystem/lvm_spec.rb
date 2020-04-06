@@ -33,6 +33,14 @@ describe provider_class do
       @resource.expects(:[]).with(:mkfs_cmd)
       @provider.create
     end
+    it 'includes -f for xfs' do
+      @resource.expects(:[]).with(:name).returns('/dev/myvg/mylv')
+      @resource.expects(:[]).with(:fs_type).returns('xfs')
+      @resource.expects(:[]).with(:options).returns('-b 4096 -E stride=32,stripe-width=64').twice
+      @provider.expects(:execute).with(['mkfs.xfs', '/dev/myvg/mylv', '-f', ['-b', '4096', '-E', 'stride=32,stripe-width=64']])
+      @resource.expects(:[]).with(:mkfs_cmd)
+      @provider.create
+    end
     it 'calls mkswap for filesystem type swap' do
       @resource.expects(:[]).with(:name).returns('/dev/myvg/mylv')
       @resource.expects(:[]).with(:fs_type).returns('swap')
@@ -49,6 +57,18 @@ describe provider_class do
       @provider.expects(:execute).with(['mkfs.ext4', '/dev/myvg/mylv', ['-O', 'journal_dev']])
       @resource.expects(:[]).with(:mkfs_cmd).returns('mkfs.ext4').twice
       @provider.create
+    end
+  end
+
+  describe 'when creating with force' do
+    it "executes the correct filesystem command with force option" do
+      @resource.expects(:[]).with(:name).returns('/dev/myvg/mylv')
+      @resource.expects(:[]).with(:fs_type).returns('ext4')
+      @resource.expects(:[]).with(:options)
+      @provider.expects(:execute).with(['mkfs.ext4', '/dev/myvg/mylv'])
+      @resource.expects(:[]).with(:mkfs_cmd)
+      @provider.create
+
     end
   end
 end
