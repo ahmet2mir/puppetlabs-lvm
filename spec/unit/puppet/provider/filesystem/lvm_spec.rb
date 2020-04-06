@@ -64,11 +64,11 @@ describe provider_class do
     it "executes the correct filesystem command with force option" do
       @resource.expects(:[]).with(:name).returns('/dev/myvg/mylv')
       @resource.expects(:[]).with(:fs_type).returns('ext4')
+      @resource.expects(:[]).with(:force).returns(:true)
       @resource.expects(:[]).with(:options)
       @provider.expects(:execute).with(['mkfs.ext4', '/dev/myvg/mylv'])
       @resource.expects(:[]).with(:mkfs_cmd)
       @provider.create
-
     end
   end
 end
